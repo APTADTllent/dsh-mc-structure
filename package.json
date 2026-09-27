@@ -1,0 +1,47 @@
+{
+  "name": "dsh-mc-structure",
+  "version": "0.1.0",
+  "description": "《我的世界》结构文件工作台：解析/导出基岩版 .mcstructure、六视图渲染、新建画布、任意方块放置与替换，并内置建筑美学数据集指导大模型搭建。",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "client": {
+      "platform": "web"
+    }
+  },
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "cordis",
+    "cordis-plugin",
+    "minecraft",
+    "mcstructure",
+    "structure",
+    "nbt",
+    "bedrock",
+    "blockbench",
+    "viewer",
+    "architecture"
+  ],
+  "license": "MIT",
+  "files": [
+    "lib",
+    "assets",
+    "scripts",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/REPLACE_ME/dsh-mc-structure.git"
+  },
+  "homepage": "https://github.com/REPLACE_ME/dsh-mc-structure#readme",
+  "bugs": {
+    "url": "https://github.com/REPLACE_ME/dsh-mc-structure/issues"
+  }
+}
