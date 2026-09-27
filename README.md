@@ -9,7 +9,19 @@
 
 ## 安装
 
-### 1. 放进 DSH profile 的 `node_modules`
+### 一条命令（推荐）
+
+```bash
+dsh plugin add https://github.com/APTADTllent/dsh-mc-structure.git
+```
+
+DSH 会把这个仓库拉进 profile 的 `node_modules` 并注册好。装完重启 DSH 即可。
+
+### 手动安装（备用）
+
+如果上面那条命令不可用，手动来也是三步：
+
+**1. 放进 DSH profile 的 `node_modules`**
 
 把本目录整个复制过去：
 
@@ -18,14 +30,9 @@
 ```
 
 `<DSH_HOME>` 通常是 `~/.dsh`（Windows 上是 `C:\Users\<你>\.dsh`）。
+复制完确认 `<DSH_HOME>/profiles/web/node_modules/dsh-mc-structure/package.json` 存在。
 
-复制完确认这个文件存在：
-
-```
-<DSH_HOME>/profiles/web/node_modules/dsh-mc-structure/package.json
-```
-
-### 2. 在补丁文件里注册
+**2. 在补丁文件里注册**
 
 编辑 `<DSH_HOME>/profiles/web/cordis.patch.yml`，加一段：
 
@@ -35,7 +42,7 @@
       name: 'dsh-mc-structure'
 ```
 
-### 3. 重启 DSH
+**3. 重启 DSH**
 
 改完补丁必须重启才生效。重启后在对话里说「打开某个 .mcstructure」，
 或者直接让它建一个结构，就能确认装好了。
@@ -57,6 +64,22 @@
 
 没提取过贴图也能用，只是六视图渲染会退化成纯色块，功能不受影响。
 **插件主体（`lib/`）是纯 ESM JavaScript，跨平台。**
+
+---
+
+## 关于进程调用与网络（安全评审说明）
+
+这个插件只调用一次外部程序：
+
+| 调用 | 用途 |
+|---|---|
+| `execFileSync('powershell', [...])` | `textures.js` 里提取原版贴图（只读客户端 jar，输出到贴图缓存目录） |
+
+**外联域名**：源码里出现的 HTTP 地址只有一个文档链接
+（`https://wiki.bedrock.dev/nbt/mcstructure`，写在注释里，不发起请求）。
+**这个插件在运行时完全不联网。**
+
+**没有硬编码密钥，没有 `eval` / `new Function`，没有递归删除，没有任何遥测或数据外发。**
 
 ---
 
@@ -115,7 +138,7 @@ index = z + sizeZ * (y + sizeY * x)
 
 ---
 
-## 用法
+## 用法教程
 
 ```
 打开桌面上的白房子.mcstructure，告诉我它每层都用了什么方块
@@ -135,6 +158,29 @@ index = z + sizeZ * (y + sizeY * x)
 
 ---
 
+## 依赖与限制
+
+### 依赖
+
+| 用途 | 需要什么 |
+|---|---|
+| 基本功能 | **无外部依赖** —— `lib/` 是纯 ESM JavaScript，只用 Node 内置模块 |
+| 六视图上色（可选） | 《我的世界》客户端 jar，用 `scripts/extract-textures.ps1` 提取贴图 |
+| 贴图提取脚本 | Windows PowerShell |
+
+### 限制
+
+- **面向基岩版结构文件**（`.mcstructure`）。画布上限 256×256×256。
+- **运行时完全不联网**，不做任何网络请求。
+- **贴图提取依赖 Windows**。没有贴图时六视图渲染退化成纯色块，
+  编辑与导出功能不受影响。
+- **导出的结构要你自己放进游戏**：本插件只负责生成文件，
+  不会自动安装进存档，也不修改游戏目录。
+- **不校验方块 ID 是否真实存在**：放进去的方块名如果拼错，
+  文件仍然能导出，但游戏里可能显示成空气。建议用游戏里真实存在的 ID。
+
+---
+
 ## 开发
 
 ```
@@ -147,6 +193,33 @@ lib/
 assets/architecture/   建筑美学数据集（8 份）
 scripts/               Windows 贴图提取脚本
 ```
+
+---
+
+## 发布信息（维护者看）
+
+**建议设置的 GitHub Topics**（插件市场靠其中之一识别）：
+
+```
+dsh-plugin          ← 必须
+dsh
+deepseek-harness
+cordis-plugin
+minecraft
+mcstructure
+nbt
+bedrock
+architecture
+viewer
+```
+
+**插件标识**：本包的 `package.json` 里已声明客户端平台，满足「插件标识」要求：
+
+```json
+"dsh": { "client": { "platform": "web" } }
+```
+
+因为它有一个浏览器半（六视图渲染）。
 
 ---
 

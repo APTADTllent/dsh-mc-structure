@@ -16,6 +16,7 @@
   },
   "keywords": [
     "dsh",
+    "dsh-plugin",
     "deepseek-harness",
     "cordis",
     "cordis-plugin",
@@ -38,10 +39,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/REPLACE_ME/dsh-mc-structure.git"
+    "url": "git+https://github.com/APTADTllent/dsh-mc-structure.git"
   },
-  "homepage": "https://github.com/REPLACE_ME/dsh-mc-structure#readme",
+  "homepage": "https://github.com/APTADTllent/dsh-mc-structure#readme",
   "bugs": {
-    "url": "https://github.com/REPLACE_ME/dsh-mc-structure/issues"
+    "url": "https://github.com/APTADTllent/dsh-mc-structure/issues"
   }
 }
