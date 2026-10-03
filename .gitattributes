@@ -1,0 +1,21 @@
+# 换行符归一：仓库里统一 LF，检出时按文件类型决定。
+#
+# 背景：这份仓库曾经是 CRLF、本地工作区是 LF，两边逐字节比对全部不一致，
+# 但把换行统一后又完全相同 —— 纯粹是换行符造成的假分叉。这个文件是那件事的处置。
+#
+# 注意：cmd.exe 按字节解析 .cmd/.bat，混进 LF 会破坏批处理本身；
+# PowerShell 脚本同理，所以这两类强制 CRLF。
+* text=auto eol=lf
+
+*.cmd   text eol=crlf
+*.bat   text eol=crlf
+*.ps1   text eol=crlf
+
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.mcstructure binary
+*.nbt   binary
+*.zip   binary

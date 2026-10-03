@@ -57,23 +57,29 @@ DSH 会把这个仓库拉进 profile 的 `node_modules` 并注册好。装完重
 
 ### 贴图（可选）
 
-`scripts/` 下有两个 Windows PowerShell 脚本用于提取/导出原版贴图：
+原版贴图由 `lib/zip.js` 直接从客户端 jar 里解出来，**纯 JavaScript（只用 Node 内置
+`zlib`），不需要 PowerShell，也不再起任何子进程**——Windows 以外的平台同样能用。
 
-- `extract-textures.ps1` — 从《我的世界》客户端 jar 里提取原版贴图
+`scripts/` 下另有一个 Windows PowerShell 脚本：
+
 - `dump-textures.ps1` — 导出贴图清单
+- `extract-textures.ps1` — 已经不在运行时路径上，仅保留给新旧实现做逐字节对比测试
+  （见 `plugin/test-zip-extract.mjs`），不再需要人手调用
 
 没提取过贴图也能用，只是六视图渲染会退化成纯色块，功能不受影响。
-**插件主体（`lib/`）是纯 ESM JavaScript，跨平台。**
 
 ---
 
 ## 关于进程调用与网络（安全评审说明）
 
-这个插件只调用一次外部程序：
+**本插件不调用任何外部程序，不起任何子进程。**
 
-| 调用 | 用途 |
+| 项目 | 状态 |
 |---|---|
-| `execFileSync('powershell', [...])` | `textures.js` 里提取原版贴图（只读客户端 jar，输出到贴图缓存目录） |
+| 起 PowerShell 子进程解包贴图 | **已移除**（2026-09-30）。贴图改由 `lib/zip.js` 用 Node 内置 `zlib` 在进程内解包 |
+
+如果你看到的评审报告里还有「执行 shell 命令」的条目，那是旧版本。自查方法：
+在 `lib/` 里搜 `node:child_process`、`execFileSync`、`execSync`、`spawn` —— 现在都应为 0 处。
 
 **外联域名**：源码里出现的 HTTP 地址只有一个文档链接
 （`https://wiki.bedrock.dev/nbt/mcstructure`，写在注释里，不发起请求）。
@@ -165,15 +171,16 @@ index = z + sizeZ * (y + sizeY * x)
 | 用途 | 需要什么 |
 |---|---|
 | 基本功能 | **无外部依赖** —— `lib/` 是纯 ESM JavaScript，只用 Node 内置模块 |
-| 六视图上色（可选） | 《我的世界》客户端 jar，用 `scripts/extract-textures.ps1` 提取贴图 |
-| 贴图提取脚本 | Windows PowerShell |
+| 六视图上色（可选） | 《我的世界》客户端 jar；贴图由 `lib/zip.js` 在进程内提取，不需要额外工具 |
+| 贴图提取脚本 | **无** —— 纯 JS，跨平台 |
 
 ### 限制
 
 - **面向基岩版结构文件**（`.mcstructure`）。画布上限 256×256×256。
 - **运行时完全不联网**，不做任何网络请求。
-- **贴图提取依赖 Windows**。没有贴图时六视图渲染退化成纯色块，
-  编辑与导出功能不受影响。
+- **贴图提取不再依赖 Windows**（2026-09-30 起改纯 JS 解包）。没找到客户端 jar 或者
+  jar 里没有原版贴图时，六视图渲染退化成纯色块，编辑与导出功能不受影响。
+  jar 内条目上限：单条解压 16 MB、单次累计 256 MB，超出会被跳过并记一条警告。
 - **导出的结构要你自己放进游戏**：本插件只负责生成文件，
   不会自动安装进存档，也不修改游戏目录。
 - **不校验方块 ID 是否真实存在**：放进去的方块名如果拼错，
